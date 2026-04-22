@@ -1,44 +1,15 @@
-# IBM-Transactions-for-AML
-This repository contains a full-scale Anti-Money Laundering (AML) pipeline designed to ingest synthetic transaction data, engineer behavioral features, and classify high-risk activity using Gradient Boosting. The project culminates in a Tableau/Plotly Dashboard designed for compliance officers to investigate generated alerts.
-
-Dataset Overview: IBM Transactions for AML
-The core of this project utilizes the IBM Synthetic Transactions for Anti-Money Laundering dataset. Unlike standard credit card fraud datasets, this data is designed to simulate complex money laundering schemes.
-
-Source: Kaggle / IBM Research
-
-Structure: A directed graph of transactions between accounts.
-
-Key Typologies: Includes simulated patterns for Structuring (Smurfing), Fan-In/Fan-Out transactions, and Circular Trades.
-
-Data Scale: Multi-million row synthetic ledger featuring Timestamp, From_Account, To_Account, Amount, Currency, and Payment_Type.
-
-🛠️ The Pipeline Architecture
-1. Data Ingestion & SQL Processing
-Schema: Transactions are stored in a relational format (PostgreSQL/DuckDB).
-
-OFAC Simulation: A mock Sanctions List is joined with account data to simulate real-world KYC (Know Your Customer) checks.
-
-2. Feature Engineering (The "Risk Signals")
-We engineer three primary classes of features to detect suspicious behavior:
-
-Velocity Features: Counts of transactions per account over rolling windows (e.g., 1h, 24h, 7d).
-
-Geo-Anomalies: Tracking sudden changes in Payment_Currency or Bank_Location inconsistent with history.
-
-Amount Z-Scores: Measuring the standard deviation of a transaction amount relative to the account's historical mean to identify outliers.
-
-3. Machine Learning Model
-Algorithm: Gradient Boosting Classifier (XGBoost/LightGBM).
-
-Training: Imbalanced class handling using SMOTE or scale-pos-weights to account for the rarity of "Laundering" labels.
-
-False-Positive Reduction: A secondary heuristic layer that suppresses alerts for verified low-risk entities (e.g., government accounts or high-volume regulated utilities).
-
-4. Risk Scoring Dashboard
-The final output is a Tableau Public or Plotly Dash interface featuring:
-
-Alert Queue: Prioritized by ML "Risk Probability" scores.
-
-Entity Profile: A deep dive into an individual account's transaction history and velocity spikes.
-
-Network View: (Optional) Visualizing the flow of funds between accounts to spot layering.
+🛡️ RiskGuard AML — End-to-End Transaction Risk & Compliance Pipeline📌 Project OverviewRiskGuard AML is a professional-grade Anti-Money Laundering (AML) pipeline and risk-scoring engine. Built on the IBM Transactions for AML dataset, it simulates how global financial institutions ingest millions of records to detect "smurfing," layering, and OFAC-sanctioned activity.The project moves beyond simple fraud detection by implementing behavioral velocity logic, geographic anomaly detection, and a false-positive reduction engine—bridging the gap between data science and regulatory compliance."In AML, a 99% accuracy rate is useless if the 1% of missed cases represents a $50M laundering scheme. RiskGuard focuses on high-recall detection with human-in-the-loop alert prioritization."🚀 What It DoesIngest & Clean: Processes raw transaction ledgers into a relational SQL-ready format.Engineer Behavioral DNA: Automatically calculates rolling velocity (txn counts), amount Z-scores (spending spikes), and geographic "hops."Predict Risk: Classifies transactions into "Low," "Medium," and "High" risk using Gradient Boosting.Sanctions Screening: Cross-references entities against a simulated OFAC SDN list.Interactive Triage: Surfaces high-probability alerts in a Tableau Dashboard for compliance review.📊 DatasetIBM Synthetic Transactions for AMLScope: Multi-million synthetic transactions between accounts.Complexity: Designed by IBM Research to simulate realistic laundering typologies (Circular trades, Fan-in/Fan-out).Key Challenge: Extreme class imbalance (Laundering events are < 0.1% of data).🤖 ML Models & LogicTaskModels UsedKey MetricLaundering ClassificationXGBoost, LightGBM, Random ForestRecall / F2-ScoreAnomaly DetectionIsolation Forest, Z-Score ScalingOutlier IdentificationFeature EngineeringSQL Window Functions, PandasVelocity & Geo-hops🛠️ Tech StackLayerTechnologyLanguagePython 3.9+Data EngineSQL (DuckDB/PostgreSQL), Pandas, NumPyMachine Learningscikit-learn, XGBoost, Imbalanced-LearnVisualizationTableau Public / PlotlyWorkflowJupyter Notebooks, GitHub Actions📁 Repository StructurePlaintextriskguard-aml/
+├── data/
+│   ├── raw/                # IBM Dataset (CSV)
+│   └── processed/          # Engineered features & SQL exports
+├── notebooks/
+│   ├── 01_eda_and_sql.ipynb      # Initial analysis & cleaning
+│   ├── 02_feature_engineering.ipynb # Velocity & Z-score logic
+│   └── 03_model_training.ipynb   # XGBoost & Evaluation
+├── src/
+│   ├── ofac_simulator.py   # Sanctions lookup logic
+│   └── pipeline_utils.py   # Modular helper functions
+├── dashboard/
+│   └── aml_triage.twbx     # Tableau Packaged Workbook
+└── README.md
+💡 Key FeaturesVelocity Scoring: Tracks if an account sends $10,000 via 50 small transactions (structuring) rather than one lump sum.OFAC Simulation: Demonstrates regulatory knowledge by flagging transactions involving high-risk jurisdictions.False-Positive Reduction: Logic-based "whitelist" filtering to ensure compliance teams aren't buried in "noise."Decision-First Dashboard: A Tableau interface built for actions, not just aesthetics—prioritizing the most "explainable" risks first.
