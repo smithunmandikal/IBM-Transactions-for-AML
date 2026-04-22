@@ -1,6 +1,17 @@
 import kagglehub
+import shutil
+import os
 
-# Download latest version
+# 1. Download to cache
 path = kagglehub.dataset_download("ealtman2019/ibm-transactions-for-anti-money-laundering-aml")
+print("Downloaded to:", path)
 
-print("Path to dataset files:", path)
+# 2. Define your project's local raw data path
+local_path = './data/raw/'
+os.makedirs(local_path, exist_ok=True)
+
+# 3. Move files to your project folder
+for file in os.listdir(path):
+    shutil.move(os.path.join(path, file), os.path.join(local_path, file))
+
+print(f"Dataset moved to: {local_path}")
